@@ -12,7 +12,7 @@ import RxCocoa
 class ViewController: UIViewController {
     @IBOutlet private var incrementButton: UIButton!
     @IBOutlet private var clearButton: UIButton!
-    @IBOutlet var label: UILabel!
+    @IBOutlet private var label: UILabel!
     
     private var labelValue: Int = 0 {
         didSet {
@@ -23,9 +23,13 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        rxSetup()
+    }
+    private func rxSetup() {
         didTapIncrementButton()
         didTapClearButton()
     }
+    
     private func didTapIncrementButton() {
         incrementButton.rx.tap
             .subscribe(onNext: { [weak self] in
