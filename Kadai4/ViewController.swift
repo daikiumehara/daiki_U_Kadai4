@@ -39,5 +39,18 @@ class ViewController: UIViewController {
             ])
             .bind(to: countRelay)
             .disposed(by: disposeBag)
+
+/*
+        // これでも良さそう
+        Observable
+            .merge([
+                clearButton.rx.tap
+                    .map { _ in 0 },
+                incrementButton.rx.tap
+                    .withLatestFrom(countRelay) { $1 + 1 } // mapの代わりにこれでもOK
+            ])
+            .bind(to: countRelay)
+            .disposed(by: disposeBag)
+*/
     }
 }
