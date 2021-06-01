@@ -13,37 +13,31 @@ class ViewController: UIViewController {
     @IBOutlet private var incrementButton: UIButton!
     @IBOutlet private var clearButton: UIButton!
     @IBOutlet private var label: UILabel!
-    
-    private var labelValue: Int = 0 {
-        didSet {
-            self.label.text = String(describing: self.labelValue)
-        }
-    }
+
+    private let countRelay = BehaviorRelay<Int>(value: 0)
+
     private let disposeBag = DisposeBag()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        rxSetup()
+        setupBindings()
     }
-    private func rxSetup() {
-        didTapIncrementButton()
-        didTapClearButton()
-    }
-    
-    private func didTapIncrementButton() {
-        incrementButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
-                self.labelValue += 1
-            })
+
+    private func setupBindings() {
+        countRelay
+            .map { String($0) }
+            .bind(to: label.rx.text)
             .disposed(by: disposeBag)
-    }
-    private func didTapClearButton() {
-        clearButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
-                self.labelValue = 0
-            })
+
+        Observable
+            .merge([
+                clearButton.rx.tap
+                    .map { _ in 0 },
+                incrementButton.rx.tap
+                    .withLatestFrom(countRelay)
+                    .map { $0 + 1 }
+            ])
+            .bind(to: countRelay)
             .disposed(by: disposeBag)
     }
 }
